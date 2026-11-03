@@ -1,0 +1,12 @@
+MISE À JOUR DU SITE
+
+1. Décompressez ce ZIP.
+2. Dans votre dépôt GitHub, choisissez Add file → Upload files.
+3. Envoyez le fichier index.html fourni ici pour remplacer celui existant, à la racine du dépôt.
+4. Validez avec Commit changes. Attendez la fin de la publication puis actualisez le site.
+
+Tout le site est inclus dans index.html : styles, calculs et bibliothèque PDF. Les anciens fichiers JS et CSS peuvent rester dans le dépôt, ils ne sont plus chargés par cette version.
+
+Le champ Année universelle à gauche commande la case correspondante (2026 → 1). Le millésime au-dessus du tableau est supprimé. La légende des couleurs est retirée du tableau et du PDF. Le PDF conserve le format A4 paysage, le nom et l’année dans son en-tête.
+
+Les sauvegardes locales et JSON restent compatibles. La licence MIT de pdf-lib est incluse dans ce ZIP.
