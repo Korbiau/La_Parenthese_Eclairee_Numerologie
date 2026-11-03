@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Numérologie Claire — Atelier</title>
+<meta name="description" content="Composez votre tableau de numérologie et exportez-le en PDF.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+<div class="brand">
+<b class="mark">✳</b>Numérologie Claire<span>L’ATELIER DES CYCLES</span>
+</div>
+<button class="primary" id="pdf">Exporter en PDF ↗</button>
+</header>
+<div class="layout">
+<aside>
+<section>
+<div class="eyebrow">01 / Votre tableau</div>
+<h2>Les premiers repères</h2>
+<label for="name">Prénom et nom</label>
+<input id="name" type="text" placeholder="Ex. Claire Dupont" maxlength="70">
+<div>
+<label for="start">Année du tableau</label>
+<input id="start" type="number" min="1" max="9999" value="2026">
+</div>
+<label for="ageRaw">Âge (à réduire)</label>
+<input id="ageRaw" type="text" inputmode="numeric" maxlength="3" placeholder="Ex. 27 → 9">
+<p class="note">L’âge et les numéros des domiciles sont réduits automatiquement à un chiffre, y compris 11, 22 et 33.</p>
+<p class="note">Cliquez dans une case et saisissez un nombre. Sa couleur s’applique automatiquement.</p>
+</section>
+<section>
+<div class="eyebrow">02 / Vos couleurs</div>
+<h2>Une couleur, un nombre</h2>
+<div id="palette" class="palette">
+</div>
+<p class="note">Cliquez sur une teinte pour la personnaliser.</p>
+<button id="restore">Rétablir la palette</button>
+</section>
+<section>
+<div class="eyebrow">03 / Vos domiciles</div>
+<h2>Les maisons au fil du temps</h2>
+<p class="note">Ajoutez une adresse, sa date d’arrivée et son numéro. Par exemple, le numéro 22 donne une case 4. La case s’étend jusqu’au déménagement suivant. Une date de départ est facultative.</p>
+<div id="homes">
+</div>
+<button id="addhome">+ Ajouter un domicile</button>
+<p class="note" id="homeerror" role="status">
+</p>
+</section>
+<section>
+<div class="eyebrow">04 / Calculatrice</div>
+<h2>Calculs numérologiques</h2>
+<label for="calcMode">Type de calcul</label>
+<select id="calcMode">
+<option value="free">Réduction d’un nombre</option>
+<option value="birth">Chemin de vie</option>
+<option value="personal">Année personnelle</option>
+<option value="name">Nombre d’expression</option>
+</select>
+<div id="calcInputs">
+</div>
+<label class="check">
+<input type="checkbox" id="masters" checked> Conserver 11, 22 et 33 dans les calculs</label>
+<button id="calculate">Calculer</button>
+<div id="calcResult" role="status" class="calcresult">
+</div>
+<p class="note" id="calcMethod">
+</p>
+<label for="calcTarget">Reporter le résultat dans</label>
+<select id="calcTarget">
+<option value="">Choisir une case…</option>
+</select>
+<button id="applyCalc" disabled>Reporter le résultat</button>
+</section>
+<div id="status" role="status" aria-live="polite">
+</div>
+</aside>
+<main>
+<div class="top">
+<div>
+<div class="eyebrow">Les rythmes de votre année</div>
+<h1>Donnez couleur à vos cycles.</h1>
+<p style="margin:0">Un tableau à composer, à conserver et à partager.</p>
+</div>
+<span class="badge">✦ Saisie libre</span>
+</div>
+<div class="toolbar">
+<p>APERÇU DU DOCUMENT</p>
+<button id="save">Sauvegarder le fichier</button>
+<button id="load">Ouvrir un fichier</button>
+<button id="clear">Vider les cases</button>
+<span id="exportFeedback" role="status" aria-live="polite">
+</span>
+<input id="file" type="file" accept="application/json,.json" class="hidden">
+</div>
+<div class="scroll">
+<article class="sheet" id="sheet">
+<div class="sheethead">
+<div>
+<div class="sheettitle">numérologie</div>
+<div class="sheetname" id="person">Votre tableau personnel</div>
+</div>
+<div class="sheetmeta">NUMÉROLOGIE CLAIRE<br>
+<span id="range">
+</span>
+</div>
+</div>
+<div id="grid">
+</div>
+<div class="legend" id="legend">
+</div>
+<div class="sheetfooter">
+<span>LES CYCLES EN COULEURS</span>
+<span>NUMÉROLOGIE CLAIRE</span>
+</div>
+</article>
+</div>
+<p class="bottom">Export possible à tout moment, même avec des cases vides. Les données sont enregistrées automatiquement sur ce navigateur. Le bouton « Exporter en PDF » télécharge directement votre tableau.</p>
+</main>
+</div>
+<script src="vendor/pdf-lib.min.js">
+</script>
+<script src="numerology.js">
+</script>
+<script src="export-pdf.js">
+</script>
+<script src="app.js">
+</script>
+</body>
+</html>
