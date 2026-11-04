@@ -1,4 +1,36 @@
-Remplacez uniquement index.html à la racine du dépôt GitHub (Add file → Upload files → Commit changes).
+LA PARENTHÈSE ÉCLAIRÉE — VERSION COMPLÈTE CARDO
 
-Cardo est appliquée à tous les textes de la page et du PDF. Les titres restent en gras. La police est embarquée : aucun chargement externe n’est nécessaire.
-Le titre est écrit exactement : La parenthèse éclairée. Toutes les fonctionnalités précédentes sont conservées.
+Cette archive contient TOUT le site, y compris les fichiers inchangés.
+Tous les fichiers sont à la racine : aucun dossier vendor requis.
+Aucun téléchargement de police ou de bibliothèque externe au démarrage.
+
+PUBLICATION
+1. Décompressez le ZIP.
+2. Ouvrez le dossier décompressé : vous devez voir index.html et styles.css.
+3. Dans votre dépôt GitHub, Add file > Upload files.
+4. Sélectionnez TOUS les fichiers de ce dossier, pas le dossier ni le ZIP.
+5. Déposez-les à la racine du dépôt pour remplacer les fichiers de mêmes noms.
+6. Validez avec Commit changes.
+7. Attendez la fin de la publication GitHub Pages, puis rechargez avec Cmd + Maj + R.
+
+L'index.html doit se trouver à la racine de la source utilisée par GitHub Pages.
+Si Pages publie depuis /docs, mettez TOUS ces fichiers dans /docs.
+Les anciens fichiers non référencés par ce nouvel index ne sont pas utilisés.
+
+VÉRIFICATION VISUELLE
+Le titre doit être « La parenthèse éclairée » et tous les textes utilisent Cardo.
+Le champ Date de naissance est présent sous Année universelle.
+Si « Numérologie Claire » apparaît, vous regardez encore une ancienne publication.
+
+CONTENU
+index.html : page complète.
+styles.css : mise en page et polices Cardo intégrées.
+app.js : interface, domiciles, calculatrice et sauvegarde locale.
+numerology.js : réductions et périodes d'années personnelles.
+export-pdf.js : téléchargement A4 et polices Cardo intégrées au PDF.
+pdf-lib.min.js : bibliothèque PDF.
+fontkit.umd.min.js : prise en charge des polices PDF.
+Cardo-LICENSE et pdf-lib-LICENSE.md : licences fournies avec la version source.
+
+Les tableaux existants restent enregistrés dans le navigateur.
+Aucun compte ChatGPT nécessaire pour utiliser le site sur GitHub Pages.

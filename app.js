@@ -1,8 +1,9 @@
+
 'use strict';
 const defaults={1:'#c83e39',2:'#8dcae5',3:'#659e59',4:'#956844',5:'#e99635',6:'#e99eb5',7:'#999d9b',8:'#242624',9:'#8d61ab',11:'#253f7e',22:'#5b3927',33:'#9c365e'};
 const names={1:'Rouge',2:'Bleu clair',3:'Vert',4:'Marron',5:'Orange',6:'Rose',7:'Gris',8:'Noir',9:'Violet',11:'Bleu foncé',22:'Marron foncé',33:'Rose foncé'};
 const $=s=>document.getElementById(s);
-let state={name:'',start:'',count:1,colors:{...defaults},values:{},homes:[]};
+let state={name:'',start:'',count:1,colors:{...defaults},values:{},homes:[],birth:''};
 const numeric=/^(?:[1-9]|11|22|33)?$/;
 function validDate(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;const d=new Date(s+'T00:00:00Z');return !isNaN(d)&&d.toISOString().slice(0,10)===s;}
 function validate(s){
@@ -11,30 +12,42 @@ function validate(s){
  const colors={...defaults};for(const n in defaults)if(/^#[a-f0-9]{6}$/i.test(s.colors?.[n]||''))colors[n]=s.colors[n];
  const values={};for(const [k,v]of Object.entries(s.values))if(/^\d*-[a-z]+-\d+$/.test(k)&&(k.includes('-age-')?/^\d{0,3}$/:numeric).test(String(v)))values[k]=String(v);
  const homes=(Array.isArray(s.homes)?s.homes:[]).slice(0,100).map(h=>({address:String(h.address||'').slice(0,160),from:validDate(h.from)?h.from:'',to:validDate(h.to)?h.to:'',number:/^\d{0,10}$/.test(String(h.number||''))?String(h.number||''):''}));
- return {name:String(s.name||'').slice(0,70),start,count:1,colors,values,homes};
+ return {name:String(s.name||'').slice(0,70),start,count:1,colors,values,homes,birth:validDate(s.birth)?s.birth:''};
 }
 try{const saved=JSON.parse(localStorage.getItem('claire-v1'));if(saved)state=validate(saved)}catch{}
 function persist(){try{localStorage.setItem('claire-v1',JSON.stringify(state));$('status').textContent='✓ Enregistré sur ce navigateur'}catch{$('status').textContent='Sauvegarde locale indisponible : sauvegardez le fichier.'}}
 function contrast(hex){const a=hex.match(/\w\w/g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);return .2126*a[0]+.7152*a[1]+.0722*a[2]>.179?'#202b22':'#ffffff'}
 function paint(el){const c=state.colors[el.value];el.parentElement.style.background=c||'#eceee6';el.style.color=c?contrast(c):'#303c35'}
 function palette(){
- $('palette').replaceChildren();for(const n in defaults){const l=document.createElement('label');l.className='swatch';l.style.margin='0';const c=document.createElement('input');c.type='color';c.value=state.colors[n];c.setAttribute('aria-label',n+' : '+names[n]);const s=document.createElement('span');s.textContent=n;l.append(c,s);$('palette').append(l);c.oninput=()=>{state.colors[n]=c.value;document.querySelectorAll('.cell').forEach(paint);legend();renderHomeBar();persist()}}legend();
+ $('palette').replaceChildren();for(const n in defaults){const l=document.createElement('label');l.className='swatch';l.style.margin='0';const c=document.createElement('input');c.type='color';c.value=state.colors[n];c.setAttribute('aria-label',n+' : '+names[n]);const s=document.createElement('span');s.textContent=n;l.append(c,s);$('palette').append(l);c.oninput=()=>{state.colors[n]=c.value;document.querySelectorAll('.cell').forEach(paint);legend();renderHomeBar();renderPersonalBar();persist()}}legend();
 }
-function legend(){$('legend').replaceChildren();for(const n in defaults){const s=document.createElement('span'),i=document.createElement('i');i.style.background=state.colors[n];s.append(i,document.createTextNode(n+' · '+names[n]));$('legend').append(s)}}
+function legend(){}
 const rows=[['ANNÉE UNIVERSELLE','universelle',1],['ANNÉE PERSONNELLE','personnelle',1],['ÂGE','age',1],['MAISONS ASTROLOGIQUES','maisons',12],['QUADRIMESTRES','quadrimestres',3],['TRIMESTRES','trimestres',4],['MOIS','mois',12]];
 function render(){
- $('name').value=state.name;$('start').value=state.start;$('ageRaw').value=state.values[state.start+'-age-0']||'';$('person').textContent=state.name||'Votre tableau personnel';$('range').textContent=state.start;$('grid').replaceChildren();
+ $('birth').value=state.birth;$('name').value=state.name;$('start').value=state.start;$('ageRaw').value=state.values[state.start+'-age-0']||'';$('person').textContent=state.name||'';$('grid').replaceChildren();
  const t=document.createElement('table');t.className='table';t.setAttribute('aria-label','Tableau des cycles de numérologie');const col=document.createElement('colgroup');for(let i=0;i<13;i++)col.append(document.createElement('col'));t.append(col);
 
  for(const [label,key,num] of rows){const r=document.createElement('tr'),th=document.createElement('th');th.scope='row';th.textContent=label;r.append(th);
- if(key==='maisons'&&state.homes.length){const td=document.createElement('td');td.colSpan=12;td.className='homecontainer';const bar=document.createElement('div');bar.className='homebar';bar.id='homebar';bar.setAttribute('aria-label','Périodes des domiciles');td.append(bar);r.append(td);}else for(let i=0;i<num;i++){
+ if(key==='personnelle'&&validDate(state.birth)&&state.start!==''){const td=document.createElement('td');td.colSpan=12;td.className='homecontainer';const bar=document.createElement('div');bar.className='homebar';bar.id='personalbar';bar.setAttribute('aria-label','Années personnelles selon la date d’anniversaire');td.append(bar);r.append(td);}else if(key==='maisons'&&state.homes.length){const td=document.createElement('td');td.colSpan=12;td.className='homecontainer';const bar=document.createElement('div');bar.className='homebar';bar.id='homebar';bar.setAttribute('aria-label','Périodes des domiciles');td.append(bar);r.append(td);}else for(let i=0;i<num;i++){
  const td=document.createElement('td');td.colSpan=12/num;const input=document.createElement('input');input.type='text';input.inputMode='numeric';input.className='cell';input.dataset.kind=key;input.maxLength=key==='age'?3:2;const k=state.start+'-'+key+'-'+i;input.dataset.key=k;input.value=key==='universelle'?singleDigit(state.start):key==='age'?singleDigit(state.values[k]):state.values[k]||'';if(key==='universelle'){input.readOnly=true;input.title='Calculé depuis le champ Année universelle à gauche';}if(key==='age'){input.readOnly=true;input.title='Âge saisi : '+(state.values[k]||'—')+' — modifiable dans le champ à gauche';}input.setAttribute('aria-label',label+' '+state.start+(num>1?' — '+(i+1):''));
  input.oninput=()=>{input.value=input.value.replace(/\D/g,'').slice(0,key==='age'?3:2);state.values[k]=input.value;paint(input);persist()};
  // Incomplete or empty cells never prevent export or trigger validation popups.
  td.append(input);r.append(td);paint(input)}t.append(r)}
  const m=document.createElement('tr');m.className='months';m.append(document.createElement('th'));for(const month of ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛT','SEP','OCT','NOV','DÉC']){const td=document.createElement('td');td.textContent=month;m.append(td)}t.append(m);$('grid').append(t);
- const info=document.createElement('div');info.id='homedates';info.className='homedates';$('grid').append(info);renderHomeBar();targets();
+ const info=document.createElement('div');info.id='homedates';info.className='homedates';$('grid').append(info);renderHomeBar();renderPersonalBar();targets();
 }
+
+function renderPersonalBar(){
+ const bar=$('personalbar'),summary=$('personalSummary');summary.replaceChildren();
+ const periods=personalYearPeriods(state);
+ if(!validDate(state.birth)){summary.textContent='Sans date de naissance, la ligne reste en saisie libre.';return}
+ if(state.start===''){summary.textContent='Renseignez l’année universelle pour calculer les périodes.';return}
+ if(!periods.length){summary.textContent='L’année indiquée précède la naissance.';}
+ const label=p=>'Cycle '+p.number+' : du '+p.from.split('-').reverse().join('/')+' au '+p.to.split('-').reverse().join('/')+' (date de fin exclue)';
+ if(bar){bar.replaceChildren();let cursor=0;for(const p of periods){if(p.a>cursor){const gap=document.createElement('div');gap.className='homepiece homegap';gap.style.width=(p.a-cursor)/12*100+'%';bar.append(gap)}const part=document.createElement('div');part.className='homepiece';part.style.width=(p.b-p.a)/12*100+'%';part.style.background=state.colors[p.number];part.style.color=contrast(state.colors[p.number]);part.textContent=p.number;part.title=label(p);part.setAttribute('aria-label',label(p));bar.append(part);cursor=p.b;}}
+ for(const p of periods){const line=document.createElement('div');line.textContent=label(p);summary.append(line)}
+}
+
 function datePosition(s,year){const [y,m,d]=s.split('-').map(Number);if(y<year)return 0;if(y>year)return 12;const days=new Date(Date.UTC(y,m,0)).getUTCDate();return m-1+(d-1)/days;}
 function homePeriods(){
  if(state.start==='')return {periods:[],warnings:state.homes.length?['Renseignez l’année universelle pour afficher les domiciles.']:[]};
@@ -64,11 +77,12 @@ for(const id of ['name','start'])$(id).oninput=()=>{
  }else state.name=$('name').value;
  render();persist();
 };
+$('birth').onchange=()=>{state.birth=validDate($('birth').value)?$('birth').value:'';render();persist()};
 $('ageRaw').oninput=()=>{const input=$('ageRaw');input.value=input.value.replace(/\D/g,'').slice(0,3);state.values[state.start+'-age-0']=input.value;render();persist()};
 $('pdf').onclick=downloadNumerologyPdf;
-$('restore').onclick=()=>{state.colors={...defaults};palette();document.querySelectorAll('.cell').forEach(paint);renderHomeBar();persist()};
+$('restore').onclick=()=>{state.colors={...defaults};palette();document.querySelectorAll('.cell').forEach(paint);renderHomeBar();renderPersonalBar();persist()};
 $('clear').onclick=()=>{if(confirm('Vider les nombres du tableau et des domiciles ? Les dates, adresses et couleurs seront conservées.')){state.values={};state.homes.forEach(h=>h.number='');renderHomes();render();persist()}};
-$('save').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));a.download='numerologie-claire.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('save').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));a.download='la-parenthese-eclairee.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $('load').onclick=()=>$('file').click();$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>1000000)throw Error();state=validate(JSON.parse(await f.text()));palette();renderHomes();render();persist();$('status').textContent='✓ Tableau importé'}catch{$('status').textContent='Fichier invalide. Sélectionnez une sauvegarde de cet outil.'}e.target.value=''};
 // Calculation conventions are shown next to the inputs; users control master-number reduction.
 function reduceDigits(value,keep){let n=String(value).replace(/^0+(?=\d)/,'');const steps=[n];while(n.length>1&&!(keep&&['11','22','33'].includes(n))){n=String([...n].reduce((a,d)=>a+Number(d),0));steps.push(n)}return {value:Number(n),steps};}
@@ -82,7 +96,8 @@ $('calculate').onclick=()=>{resetResult();const mode=$('calcMode').value;let sou
  else if(mode==='name'){const raw=$('calcName').value.toUpperCase().replaceAll('Œ','OE').replaceAll('Æ','AE').normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(/[^A-Z\s’'\-]/.test(raw)){$('calcResult').textContent='Utilisez les lettres de l’alphabet latin.';return}const letters=raw.replace(/[^A-Z]/g,'');if(!letters){$('calcResult').textContent='Saisissez un nom.';return}const nums=[...letters].map(c=>(c.charCodeAt(0)-65)%9+1);source=String(nums.reduce((a,b)=>a+b,0));detail=nums.join(' + ')+' = '+source;}
  else{if(mode==='personal'&&state.start===''){$('calcResult').textContent='Renseignez l’année universelle à gauche.';return}const date=$('calcBirth').value;if(!validDate(date)){$('calcResult').textContent='Renseignez une date de naissance valide.';return}source=mode==='birth'?date.replaceAll('-',''):date.slice(5).replace('-','')+state.start;source=[...source].join('');detail=mode==='personal'?'Jour + mois + année '+state.start:'Tous les chiffres de la date';}
  const r=reduceDigits(source,$('masters').checked);calcValue=r.value;const n=document.createElement('div');n.textContent='Résultat : '+r.value;const small=document.createElement('small');small.textContent=(detail?detail+' · ':'')+r.steps.join(' → ');$('calcResult').append(n,small);$('applyCalc').disabled=!$('calcTarget').value||!Object.hasOwn(defaults,calcValue);};
-function targets(){const previous=$('calcTarget').value;$('calcTarget').replaceChildren(new Option('Choisir une case…',''));for(const [label,key,num]of rows){if(key==='universelle'||key==='age'||key==='maisons'&&state.homes.length)continue;for(let i=0;i<num;i++)$('calcTarget').add(new Option(label+(num>1?' '+(i+1):''),state.start+'-'+key+'-'+i))}state.homes.forEach((h,i)=>$('calcTarget').add(new Option('DOMICILE '+(i+1),'home:'+i)));$('calcTarget').value=previous;$('applyCalc').disabled=calcValue===null||!$('calcTarget').value||!Object.hasOwn(defaults,calcValue)}
+function targets(){const previous=$('calcTarget').value;$('calcTarget').replaceChildren(new Option('Choisir une case…',''));for(const [label,key,num]of rows){if(key==='personnelle'&&validDate(state.birth)&&state.start!==''||key==='universelle'||key==='age'||key==='maisons'&&state.homes.length)continue;for(let i=0;i<num;i++)$('calcTarget').add(new Option(label+(num>1?' '+(i+1):''),state.start+'-'+key+'-'+i))}state.homes.forEach((h,i)=>$('calcTarget').add(new Option('DOMICILE '+(i+1),'home:'+i)));$('calcTarget').value=previous;$('applyCalc').disabled=calcValue===null||!$('calcTarget').value||!Object.hasOwn(defaults,calcValue)}
 $('calcTarget').onchange=()=>{$('applyCalc').disabled=calcValue===null||!$('calcTarget').value||!Object.hasOwn(defaults,calcValue)};
 $('applyCalc').onclick=()=>{const target=$('calcTarget').value;if(calcValue===null||!target||!Object.hasOwn(defaults,calcValue))return;if(target.startsWith('home:')){state.homes[+target.split(':')[1]].number=String(calcValue);renderHomes()}else state.values[target]=String(calcValue);render();persist();$('status').textContent='✓ Résultat reporté dans le tableau'};
 palette();renderHomes();render();calculator();
+
